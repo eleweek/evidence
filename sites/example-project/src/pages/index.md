@@ -7,10 +7,10 @@ You can edit the content of this page by opening **`pages/index.md`** in an edit
 
 # Steps to get started
 ## [1. Connect your database &rarr;](/settings)
-## [2. Install the VS Code extension &rarr;](https://marketplace.visualstudio.com/items?itemName=Evidence.evidence-vscode)
-## [3. See examples of what you can do with Evidence &rarr;](/1.-getting-started)
+## [2. Start building with Evidence &rarr;](/1.-getting-started)
 
 # Resources
 ## [Star our GitHub repo &rarr;](https://github.com/evidence-dev/evidence)
 ## [Join us in Slack &rarr;](https://join.slack.com/t/evidencedev/shared_invite/zt-uda6wp6a-hP6Qyz0LUOddwpXW5qG03Q)
 ## [Check out the Evidence docs &rarr;](https://docs.evidence.dev)
+## [Install the VS Code Extension &rarr;](https://marketplace.visualstudio.com/items?itemName=Evidence.evidence-vscode)

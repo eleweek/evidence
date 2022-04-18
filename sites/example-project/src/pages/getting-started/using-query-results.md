@@ -1,4 +1,6 @@
-# Examples
+# Using Query Results
+
+## Charts
 
 ```intro
     select "2009-12-31" as year, "Canada" as country, 10000000 as sales_usd
@@ -89,6 +91,24 @@
     subtitle="$ in USD"
 />
 
+<BarChart
+    data={data.intro}
+    x=year
+    y=sales_usd
+    series=country
+    title="Sales by Country"
+    subtitle="$ in USD"
+/>
+
+
+## Tables
+
+<DataTable
+    data={data.intro}
+/>
+
+## Text
+
 ```us_sales
 select *
 from ${intro} 
@@ -97,3 +117,4 @@ order by year desc
 ```
 
 US sales in the most recent year (<Value data={data.us_sales} column=year/>) were <Value data={data.us_sales} column=sales_usd />
+
