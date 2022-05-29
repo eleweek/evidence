@@ -47,9 +47,6 @@ const validateQuery = function (query) {
     }
 }
 
-
-
-
 const importDBAdapter = async function(settings) {
     try {
         databaseType = settings ? settings.database : process.env["DATABASE"] || process.env["database"]
@@ -63,6 +60,27 @@ const importDBAdapter = async function(settings) {
     }
 }
 
+const processQueryResults = function (queryResults) {
+    let rows;
+    let fieldTypes;
+    
+    console.log(`Post processing query results with fields ${JSON.stringify(queryResults.fieldTypes)}`);
+    if (queryResults.rows) {
+        rows = queryResults.rows;
+    } else {
+        rows = queryResults;
+    }
+
+    if (queryResults.fieldTypes) {
+        fieldTypes = queryResults.fieldTypes;
+    } else {
+        //TODO fieldTypes = inferFieldTypes(rows);
+    }
+
+    console.log(`Processed query results. Original:${JSON.stringify(queryResults)}\n Rows:${JSON.stringify(rows)}\n FieldTypes:${JSON.stringify(fieldTypes)}`);
+    
+    return {rows, fieldTypes};
+}
 const runQueries = async function (routeHash, dev) {
     const settings = readJSONSync('./evidence.settings.json', {throws:false})
     const runQuery = await importDBAdapter(settings)
@@ -79,19 +97,23 @@ const runQueries = async function (routeHash, dev) {
         for (let queryIndex in queries) {
             let query = queries[queryIndex];
             let queryTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours());              
-            let cache = getCache(dev, query.compiledQueryString, queryTime)
+            let cache = undefined;//getCache(dev, query.compiledQueryString, queryTime)
             if (cache) {
                 data[query.id] = cache
                 process.stdout.write(chalk.greenBright("✓ "+ query.id) +  chalk.grey(" from cache \n"))
             } else {
                 try {
                     process.stdout.write(chalk.grey("  "+ query.id +" running..."));
-                    console.log("Next query", query); //TODO debug
-                    
                     validateQuery(query)
-                    data[query.id] = await runQuery(query.compiledQueryString, settings?.credentials, dev);
-                    
-                    data["evidencemeta"][queryIndex].fieldTypes = {'todo': 'figure-this-out' }; 
+                    let queryResults = processQueryResults(await runQuery(query.compiledQueryString, settings?.credentials, dev));
+                    console.log(`Ran query ${query.id} and obtained queryResults ${JSON.stringify(queryResults, null, 2)}`);
+                    data[query.id] = queryResults.rows;
+                    if (queryResults.fieldTypes) {
+                        let queryMetaData = data.evidencemeta?.queries[queryIndex];
+                        queryMetaData.fieldTypes = queryResults.fieldTypes;
+                    } else {
+                        console.log("Field types not found");
+                    }
                     readline.cursorTo(process.stdout, 0);
                     process.stdout.write(chalk.greenBright("✓ "+ query.id) + chalk.grey(" from database \n"))
                     updateCache(dev, query.compiledQueryString, data[query.id], queryTime)
@@ -121,7 +143,7 @@ const testConnection = async function () {
 
     try {
         process.stdout.write(chalk.grey("  "+ query.id +" running..."))
-        queryResult = await runQuery(query.compiledQueryString, settings.credentials)
+        await runQuery(query.compiledQueryString, settings.credentials)
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(chalk.greenBright("✓ "+ query.id) + chalk.grey(" from database \n"))
         result = "Database Connected";
