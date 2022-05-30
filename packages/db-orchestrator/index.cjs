@@ -2,7 +2,23 @@ const { readdirSync, readJSONSync, writeJSONSync, pathExistsSync, emptyDirSync, 
 const md5 = require("blueimp-md5")
 const chalk = require('chalk')
 const logEvent = require('@evidence-dev/telemetry')
+//const getColumnSummary = require('@evidence-dev/components/modules/getColumnSummary');
 const readline = require('readline');
+
+var EvidenceType;
+(function (EvidenceType) {
+    EvidenceType["BOOLEAN"] = "boolean";
+    EvidenceType["NUMBER"] = "number";
+    EvidenceType["STRING"] = "string";
+    EvidenceType["DATE"] = "date";
+})(EvidenceType || (EvidenceType = {})); //TODO avoid duplication
+
+var TypeFidelity;
+(function (TypeFidelity) {
+    TypeFidelity["INFERRED"] = "inferred";
+    TypeFidelity["PRECISE"] = "precise";
+    TypeFidelity["UNKNOWN"] = "unknown";
+})(TypeFidelity || (TypeFidelity = {}));
 
 const getCache = function (dev, queryString, queryTime) {
     queryTime = md5(queryTime)
@@ -60,11 +76,32 @@ const importDBAdapter = async function(settings) {
     }
 }
 
+const inferValueType = function (columnValue) {
+    if (typeof columnValue == 'number') {
+        return EvidenceType.NUMBER;
+    } else if (typeof columnValue == 'boolean') {
+        return EvidenceType.BOOLEAN;
+    } else {
+        //TODO see what Sean did. May make sense to send a bunch of rows
+        //may also want to look for numbers and booleans in strings (e.g "232.232", or "false")
+        return EvidenceType.STRING;
+    }
+}
 const inferFieldTypes = function (rows) {
     if (rows && rows.length > 0) {
-        let firstRow = rows[0];
+        let columns = Object.keys(rows[0]);
+        let fieldTypes = columns?.map(column => {
+            let firstRowWithColumnValue = rows.find(element => element[column] == null ? false: true);
+            if (firstRowWithColumnValue) {
+                let inferredType = inferValueType(firstRowWithColumnValue[column]);
+                return {'name':column, 'evidenceType':inferredType, 'typeFidelity':TypeFidelity.INFERRED};
+            } else {
+                return {'name':column, 'evidenceType':inferredType, 'typeFidelity':TypeFidelity.UNKNOWN};
+            }
+        });
+        return fieldTypes;
     }
-    return null;
+    return undefined;
 }
 const processQueryResults = function (queryResults) {
     let rows;
