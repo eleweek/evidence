@@ -56,14 +56,18 @@ const nativeTypeToEvidenceType = function (dataTypeId, defaultType = undefined) 
             return defaultType;
     }
 };
-const nativeToEvidenceType = function (results) {
+
+const mapResultFieldsToEvidenceFields = function (results) {
     return results.fields.map(field => {
         let evidenceType = nativeTypeToEvidenceType(field.dataTypeID, EvidenceType.STRING);
         console.log(`${field.name} mapped to ${evidenceType}`);
-        return ({ 'name': field.name, 'evidenceType':  evidenceType});
+        return ({
+            'name': field.name, 
+            'evidenceType':  evidenceType, 
+            'typeFidelity' : 'precise' 
+        });
     });
 };
-//end fields
 
 const standardizeResult = async(result) => {
     var output = [];
@@ -116,7 +120,7 @@ const runQuery = async (queryString, database) => {
 
         const standardizedRows = await standardizeResult(result.rows);
 
-        return { rows: standardizedRows, fieldTypes : nativeToEvidenceType(result) };
+        return { rows: standardizedRows, fieldTypes : mapResultFieldsToEvidenceFields(result) };
     } catch (err) {
         if (err.message) {
             throw err.message.replace(/\n|\r/g, " ")

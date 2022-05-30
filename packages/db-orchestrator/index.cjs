@@ -60,11 +60,17 @@ const importDBAdapter = async function(settings) {
     }
 }
 
+const inferFieldTypes = function (rows) {
+    if (rows && rows.length > 0) {
+        let firstRow = rows[0];
+    }
+    return null;
+}
 const processQueryResults = function (queryResults) {
     let rows;
     let fieldTypes;
     
-    console.log(`Post processing query results with fields ${JSON.stringify(queryResults.fieldTypes)}`);
+    console.log(`Post processing query results with fields ${JSON.stringify(queryResults.fieldTypes, null, 2)}`);
     if (queryResults.rows) {
         rows = queryResults.rows;
     } else {
@@ -74,7 +80,7 @@ const processQueryResults = function (queryResults) {
     if (queryResults.fieldTypes) {
         fieldTypes = queryResults.fieldTypes;
     } else {
-        //TODO fieldTypes = inferFieldTypes(rows);
+        fieldTypes = inferFieldTypes(rows);
     }
 
     console.log(`Processed query results. Original:${JSON.stringify(queryResults)}\n Rows:${JSON.stringify(rows)}\n FieldTypes:${JSON.stringify(fieldTypes)}`);
@@ -93,7 +99,6 @@ const runQueries = async function (routeHash, dev) {
     if (queries.length > 0) {
         let data = {}
         data["evidencemeta"] = {queries} // eventually move to seperate metadata API (md frontmatter etc.) 
-        console.log("Evidence metdata", data["evidencemeta"]); //TODO debug
         for (let queryIndex in queries) {
             let query = queries[queryIndex];
             let queryTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours());              

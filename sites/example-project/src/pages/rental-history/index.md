@@ -43,4 +43,8 @@ limit 10;
 
 {/each}
 
-<Value value={JSON.stringify(data.evidencemeta)}/>
+Meta Data
+<Value value={JSON.stringify(data.evidencemeta, 2, null)}/>
+
+<br/>
+/>
