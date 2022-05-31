@@ -90,7 +90,7 @@ const inferValueType = function (columnValue) {
 const inferColumnTypes = function (rows) {
     if (rows && rows.length > 0) {
         let columns = Object.keys(rows[0]);
-        let fieldTypes = columns?.map(column => {
+        let columnTypes = columns?.map(column => {
             let firstRowWithColumnValue = rows.find(element => element[column] == null ? false: true);
             if (firstRowWithColumnValue) {
                 let inferredType = inferValueType(firstRowWithColumnValue[column]);
@@ -99,13 +99,13 @@ const inferColumnTypes = function (rows) {
                 return {'name':column, 'evidenceType':inferredType, 'typeFidelity':TypeFidelity.UNKNOWN};
             }
         });
-        return fieldTypes;
+        return columnTypes;
     }
     return undefined;
 }
 const processQueryResults = function (queryResults) {
     let rows;
-    let fieldTypes;
+    let columnTypes;
     
     if (queryResults.rows) {
         rows = queryResults.rows;
@@ -113,20 +113,20 @@ const processQueryResults = function (queryResults) {
         rows = queryResults;
     }
 
-    if (queryResults.fieldTypes) {
-        fieldTypes = queryResults.fieldTypes;
+    if (queryResults.columnTypes) {
+        columnTypes = queryResults.columnTypes;
     } else {
-        fieldTypes = inferColumnTypes(rows);
+        columnTypes = inferColumnTypes(rows);
     }
 
-    return {rows, fieldTypes};
+    return {rows, columnTypes};
 }
 
 /** adds columnTypes to metadata in the page `data` object */
 const populateColumnTypeMetadata = (data, queryIndex, columnTypes) => {
     let queryMetaData = data.evidencemeta?.queries[queryIndex];
     if (columnTypes) {
-        queryMetaData.fieldTypes = columnTypes;
+        queryMetaData.columnTypes = columnTypes;
     }
 } 
 
@@ -162,15 +162,15 @@ const runQueries = async function (routeHash, dev) {
                 try {
                     process.stdout.write(chalk.grey("  "+ query.id +" running..."));
                     validateQuery(query);
-                    let {rows, fieldTypes} = processQueryResults(await runQuery(query.compiledQueryString, settings?.credentials, dev));
+                    let {rows, columnTypes} = processQueryResults(await runQuery(query.compiledQueryString, settings?.credentials, dev));
 
                     data[query.id] = rows;
-                    populateColumnTypeMetadata(data, queryIndex, fieldTypes);
+                    populateColumnTypeMetadata(data, queryIndex, columnTypes);
 
                     readline.cursorTo(process.stdout, 0);
                     process.stdout.write(chalk.greenBright("✓ "+ query.id) + chalk.grey(" from database \n"))
 
-                    updateCache(dev, query.compiledQueryString, data[query.id], fieldTypes, queryTime);
+                    updateCache(dev, query.compiledQueryString, data[query.id], columnTypes, queryTime);
 
                     logEvent("db-query", dev, settings)
                 } catch(err) {

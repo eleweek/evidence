@@ -65,7 +65,7 @@ const runQuery = async (queryString, database) => {
             autoPaginate: false,
         }); //TODO figure out API results
         const standardizedRows = await standardizeResult(rows);
-        return { rows: standardizedRows, fieldTypes : mapResultFieldsToEvidenceFields(response) };
+        return { rows: standardizedRows, columnTypes : mapResultsToEvidenceColumnTypes(response) };
     } catch (err) {
         if (err.errors) {
             throw err.errors[0].message           
@@ -111,7 +111,7 @@ const nativeTypeToEvidenceType = function (nativeFieldType, defaultType = undefi
     }
 };
 
-const mapResultFieldsToEvidenceFields = function (results) {
+const mapResultsToEvidenceColumnTypes = function (results) {
     let result = results?.schema?.fields?.map(field => {
         return (
           {

@@ -57,7 +57,7 @@ const nativeTypeToEvidenceType = function (dataTypeId, defaultType = undefined) 
     }
 };
 
-const mapResultFieldsToEvidenceFields = function (results) {
+const mapResultsToEvidenceColumnTypes = function (results) {
     return results.fields.map(field => {
         let evidenceType = nativeTypeToEvidenceType(field.dataTypeID, EvidenceType.STRING);
         console.log(`${field.name} mapped to ${evidenceType}`);
@@ -120,7 +120,7 @@ const runQuery = async (queryString, database) => {
 
         const standardizedRows = await standardizeResult(result.rows);
 
-        return { rows: standardizedRows, fieldTypes : mapResultFieldsToEvidenceFields(result) };
+        return { rows: standardizedRows, columnTypes : mapResultsToEvidenceColumnTypes(result) };
     } catch (err) {
         if (err.message) {
             throw err.message.replace(/\n|\r/g, " ")
