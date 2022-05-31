@@ -43,6 +43,7 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
     let routeHash = getRouteHash(filename)
     let defaultProps = `
         import { page } from '$app/stores';
+        import { setContext, getContext } from 'svelte';
         import { pageHasQueries } from '@evidence-dev/components/ui/stores';
         import BigLink from '${componentSource}/ui/BigLink.svelte';
         import Value from '${componentSource}/viz/Value.svelte';
@@ -66,8 +67,19 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
   
     if(hasQueries(filename)){
         defaultProps = `
-            export let data
-            pageHasQueries.update(value => value = true)
+            export let data;
+            pageHasQueries.update(value => value = true);
+            setContext('myTestKey', 'myTestValue');
+            
+            if (data?.evidencemeta?.queries) {
+                for (query of data.evidencemeta.queries) {
+                    setContext(query.id, { 'columnTypes' : query.columnTypes, 'data' : data[query.id] });
+                }
+            }
+            
+            console.log('your data ' + JSON.stringify(data, null, 2));
+            //console.log('your context ' + JSON.stringify(getContext('rentals_by_day'), null, 2));
+
             import QueryViewer from '@evidence-dev/components/ui/QueryViewer.svelte';
             ${defaultProps}
         `

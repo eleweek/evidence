@@ -43,8 +43,15 @@ limit 10;
 
 {/each}
 
+<DataTable data={[{col1:'A', col2: 100 }, {col1: 'B', col2: 200}]} />
+
+<DataTable query='rentals_by_customer' />
+<DataTable data={data.rentals_by_customer} />
+
+
 Meta Data
-<Value value={JSON.stringify(data.evidencemeta, 2, null)}/>
+<Value value={JSON.stringify(data.evidencemeta, 2, null)} />
+
 
 <br/>
 />

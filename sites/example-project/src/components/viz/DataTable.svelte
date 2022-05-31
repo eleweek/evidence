@@ -1,4 +1,5 @@
 <script>
+    import { getContext} from 'svelte';
     import { slide } from 'svelte/transition';
     import formatValue from '$lib/modules/formatValue.js';
     import ErrorChart from './ErrorChart.svelte'
@@ -9,6 +10,7 @@
 
     // 1 - Get Inputs
     export let data = undefined;
+    export let query = undefined;
     export let rows = 5;
     export let marginTop = '1em';
     export let marginBottom = '0em';
@@ -35,7 +37,15 @@
 
     try{
       // 2 - Check Inputs
-      checkInputs(data);
+      try {
+        checkInputs(data);
+      } catch (err) {
+        if (query) {
+          data = getContext(query).data;
+        } else {
+          throw error;
+        }
+      }
 
       // 3 - Get Column Summary
       columnSummary = getColumnSummary(data, 'array');
