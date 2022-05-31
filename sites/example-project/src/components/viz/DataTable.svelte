@@ -10,7 +10,7 @@
 
     // 1 - Get Inputs
     export let data = undefined;
-    export let query = undefined;
+    export let queryID = undefined;
     export let rows = 5;
     export let marginTop = '1em';
     export let marginBottom = '0em';
@@ -38,13 +38,14 @@
     try{
       // 2 - Check Inputs
       try {
+        if (queryID && data) {
+          throw Error('Only one of "queryID" or "data" attributes should be provided');
+        } else if (queryID) {
+          data = getContext('pageQueryResults').getData(queryID);
+        }
         checkInputs(data);
       } catch (err) {
-        if (query) {
-          data = getContext('pageQueryResults').getData(query);
-        } else {
           throw error;
-        }
       }
 
       // 3 - Get Column Summary
@@ -143,7 +144,7 @@
   </div>
   {/if}
 </div>   
-<DownloadData {data} onHover={true} {hovering}/>
+<DownloadData {data} {queryID} onHover={true} {hovering}/>
 
 </div>
 {:else}

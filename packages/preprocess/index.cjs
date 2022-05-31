@@ -82,7 +82,7 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
                 }
             });
 
-            console.log('your data ' + JSON.stringify(data, null, 2));
+            console.log('data=' + JSON.stringify(data, null, 2));
 
             import QueryViewer from '@evidence-dev/components/ui/QueryViewer.svelte';
             ${defaultProps}
