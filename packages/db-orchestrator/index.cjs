@@ -32,8 +32,8 @@ const getQueryCachePaths = (queryString, queryTime) => {
     }
 }
 
-const updateCache = function (dev, queryString, data, columnTypes, queryTime) {
-    if (dev) {
+const updateCache = function (devMode, queryString, data, columnTypes, queryTime) {
+    if (devMode) {
         const {cacheDirectory, resultsCacheFile, columnTypeCacheFile} = getQueryCachePaths(queryString, queryTime);
         if (!pathExistsSync(cacheDirectory)) {
             emptyDirSync(cacheDirectory); //TODO I think this invalidates the entire cache.  Check if this is by design.
@@ -41,7 +41,7 @@ const updateCache = function (dev, queryString, data, columnTypes, queryTime) {
         }
         writeJSONSync(resultsCacheFile, data, { throws: false });
         if (columnTypes) {
-            writeJSONSync(columnTypeCacheFile, data, { throws: false });
+            writeJSONSync(columnTypeCacheFile, columnTypes, { throws: false });
         }
     }
 }
@@ -123,7 +123,8 @@ const processQueryResults = function (queryResults) {
     return {rows, fieldTypes};
 }
 
-const setQueryColumnTypes = (data, queryIndex, columnTypes) => {
+/** adds columnTypes to metadata in the page `data` object */
+const populateColumnTypeMetadata = (data, queryIndex, columnTypes) => {
     let queryMetaData = data.evidencemeta?.queries[queryIndex];
     if (columnTypes) {
         queryMetaData.fieldTypes = columnTypes;
@@ -157,7 +158,7 @@ const runQueries = async function (routeHash, dev) {
                 logEvent("cache-query", dev);
                 data[query.id] = cache;
                 if (columnTypeCache) {
-                    setQueryColumnTypes(data, queryIndex, columnTypeCache);
+                    populateColumnTypeMetadata(data, queryIndex, columnTypeCache);
                 }
                 process.stdout.write(chalk.greenBright("✓ "+ query.id) +  chalk.grey(" from cache \n"));
             } else {
@@ -169,7 +170,7 @@ const runQueries = async function (routeHash, dev) {
                     console.log(`Ran query ${query.id} and obtained rows ${JSON.stringify(rows, null, 2)} and columnTypes=${JSON.stringify(fieldTypes, null, 2)}`);
 
                     data[query.id] = rows;
-                    setQueryColumnTypes(data, queryIndex, fieldTypes);
+                    populateColumnTypeMetadata(data, queryIndex, fieldTypes);
 
                     readline.cursorTo(process.stdout, 0);
                     process.stdout.write(chalk.greenBright("✓ "+ query.id) + chalk.grey(" from database \n"))
