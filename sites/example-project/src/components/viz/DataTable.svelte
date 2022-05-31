@@ -41,7 +41,7 @@
         checkInputs(data);
       } catch (err) {
         if (query) {
-          data = getContext(query).data;
+          data = getContext('pageQueryResults').getData(query);
         } else {
           throw error;
         }

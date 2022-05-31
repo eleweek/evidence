@@ -45,13 +45,20 @@ limit 10;
 
 <DataTable data={[{col1:'A', col2: 100 }, {col1: 'B', col2: 200}]} />
 
+### Rentals by customer via Query
 <DataTable query='rentals_by_customer' />
+### Rentals by customer via data
 <DataTable data={data.rentals_by_customer} />
 
+
+### Rentals by date via Query
+<DataTable query='rentals_by_day' />
+### Rentals by date via date
+<DataTable data={data.rentals_by_day} />
 
 Meta Data
 <Value value={JSON.stringify(data.evidencemeta, 2, null)} />
 
 
 <br/>
-/>
+

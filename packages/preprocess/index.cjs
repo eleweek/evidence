@@ -69,16 +69,20 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
         defaultProps = `
             export let data;
             pageHasQueries.update(value => value = true);
-            setContext('myTestKey', 'myTestValue');
-            
-            if (data?.evidencemeta?.queries) {
-                for (query of data.evidencemeta.queries) {
-                    setContext(query.id, { 'columnTypes' : query.columnTypes, 'data' : data[query.id] });
+
+            setContext('pageQueryResults', {
+                getData: (queryName) => {
+                    return data[queryName];
+                },
+                getColumnTypes: (queryName) => {
+                    let columnTypes = data.evidencemeta?.queries?.filter(query => query.id === queryName)?.map(record => record.columnTypes);
+                    if (columnTypes && columnTypes.length > 0) {
+                        return columnTypes[0];
+                    }
                 }
-            }
-            
+            });
+
             console.log('your data ' + JSON.stringify(data, null, 2));
-            //console.log('your context ' + JSON.stringify(getContext('rentals_by_day'), null, 2));
 
             import QueryViewer from '@evidence-dev/components/ui/QueryViewer.svelte';
             ${defaultProps}
