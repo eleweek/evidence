@@ -24,11 +24,13 @@ var TypeFidelity;
 
 
 const getQueryCachePaths = (queryString, queryTime) => {
-    let path = `${cacheDirectory}/${md5(queryTime)}`;
+    let queryTimeMD5 = md5(queryTime);
+    let queryStringMD5 = md5(queryString);
+    let path = `${cacheDirectory}/${queryTimeMD5}`;
     return {
         'cacheDirectory': path,
-        'resultsCacheFile': `${cacheDirectory}/${md5(queryTime)}/${md5(queryString)}.json`,
-        'columnTypeCacheFile': `${cacheDirectory}/${md5(queryTime)}/${md5(queryString)}-column-types.json`,
+        'resultsCacheFile': `${cacheDirectory}/${queryTimeMD5}/${queryStringMD5}.json`,
+        'columnTypeCacheFile': `${cacheDirectory}/${queryTimeMD5}/${queryStringMD5}-column-types.json`,
     }
 }
 
@@ -85,7 +87,7 @@ const inferValueType = function (columnValue) {
         return EvidenceType.STRING;
     }
 }
-const inferFieldTypes = function (rows) {
+const inferColumnTypes = function (rows) {
     if (rows && rows.length > 0) {
         let columns = Object.keys(rows[0]);
         let fieldTypes = columns?.map(column => {
@@ -105,7 +107,6 @@ const processQueryResults = function (queryResults) {
     let rows;
     let fieldTypes;
     
-    console.log(`Post processing query results with fields ${JSON.stringify(queryResults.fieldTypes, null, 2)}`);
     if (queryResults.rows) {
         rows = queryResults.rows;
     } else {
@@ -115,11 +116,9 @@ const processQueryResults = function (queryResults) {
     if (queryResults.fieldTypes) {
         fieldTypes = queryResults.fieldTypes;
     } else {
-        fieldTypes = inferFieldTypes(rows);
+        fieldTypes = inferColumnTypes(rows);
     }
 
-    console.log(`Processed query results. Original:${JSON.stringify(queryResults)}\n Rows:${JSON.stringify(rows)}\n FieldTypes:${JSON.stringify(fieldTypes)}`);
-    
     return {rows, fieldTypes};
 }
 
@@ -128,8 +127,6 @@ const populateColumnTypeMetadata = (data, queryIndex, columnTypes) => {
     let queryMetaData = data.evidencemeta?.queries[queryIndex];
     if (columnTypes) {
         queryMetaData.fieldTypes = columnTypes;
-    } else {
-        console.log("Field types not found");
     }
 } 
 
@@ -166,8 +163,6 @@ const runQueries = async function (routeHash, dev) {
                     process.stdout.write(chalk.grey("  "+ query.id +" running..."));
                     validateQuery(query);
                     let {rows, fieldTypes} = processQueryResults(await runQuery(query.compiledQueryString, settings?.credentials, dev));
-
-                    console.log(`Ran query ${query.id} and obtained rows ${JSON.stringify(rows, null, 2)} and columnTypes=${JSON.stringify(fieldTypes, null, 2)}`);
 
                     data[query.id] = rows;
                     populateColumnTypeMetadata(data, queryIndex, fieldTypes);
