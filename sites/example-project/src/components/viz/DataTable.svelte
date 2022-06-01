@@ -45,7 +45,7 @@
         }
         checkInputs(data);
       } catch (err) {
-          throw error;
+          throw err;
       }
 
       // 3 - Get Column Summary

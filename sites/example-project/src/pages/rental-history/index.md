@@ -43,6 +43,9 @@ limit 10;
 ### Rentals by customer via Query
 <DataTable queryID=rentals_by_customer />
 
+### Rentals by customer via Context Data
+<DataTable data={rentals_by_customer} />
+
 ### Rentals by customer via Data
 <DataTable data={data.rentals_by_customer} /> <!-- this has to continue to work thing -->
 

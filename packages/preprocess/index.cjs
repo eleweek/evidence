@@ -65,14 +65,33 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
         let routeHash = '${routeHash}'
         `
   
-    if(hasQueries(filename)){
+    if(hasQueries(filename)){ //getQueriesById(filename) => ['query1', 'query2']
         defaultProps = `
             export let data;
             pageHasQueries.update(value => value = true);
 
             setContext('pageQueryResults', {
                 getData: (queryName) => {
-                    return data[queryName];
+                    let originalData = data[queryName];
+                    let evidenceTypedData = [];
+                    let columnTypes = data.evidencemeta?.queries?.filter(query => query.id === queryName)?.map(record => record.columnTypes);
+
+                    for (var i = 0; i < originalData.length; i++) {
+                        let nextItem = originalData[i];
+                        if (nextItem && columnTypes) {
+                            if (!nextItem.hasOwnProperty('_evidenceColumnTypes')) {
+                                Object.defineProperty(nextItem, '_evidenceColumnTypes', {
+                                    enumerable: false,
+                                    value: columnTypes,
+                                });
+                            }
+                        }
+                        evidenceTypedData.push(nextItem);
+                    }
+                    console.log('queryName=' + JSON.stringify(evidenceTypedData, null, 2));
+                    console.log('firstRowEvidenceMetadata=' + JSON.stringify(evidenceTypedData[0]['_evidenceColumnTypes']), null, 2);
+
+                    return evidenceTypedData;
                 },
                 getColumnTypes: (queryName) => {
                     let columnTypes = data.evidencemeta?.queries?.filter(query => query.id === queryName)?.map(record => record.columnTypes);
@@ -81,6 +100,9 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
                     }
                 }
             });
+
+            //TODO inject queries using extracted query objects.
+            let rentals_by_customer = getContext('pageQueryResults').getData('rentals_by_customer');
 
             console.log('data=' + JSON.stringify(data, null, 2));
 
