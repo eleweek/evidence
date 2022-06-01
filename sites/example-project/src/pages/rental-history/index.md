@@ -37,23 +37,20 @@ limit 10;
 ```
 ## Top 10 Customers
 
-{#each data.rentals_by_customer as customer_rentals}
-
-{customer_rentals.customer_name}: <Value value={customer_rentals.total_rentals}/>
-
-{/each}
 
 <DataTable data={[{col1:'A', col2: 100 }, {col1: 'B', col2: 200}]} />
 
 ### Rentals by customer via Query
-<DataTable queryID='rentals_by_customer' />
-### Rentals by customer via data
-<DataTable data={data.rentals_by_customer} />
+<DataTable queryID=rentals_by_customer />
+
+### Rentals by customer via Data
+<DataTable data={data.rentals_by_customer} /> <!-- this has to continue to work thing -->
 
 
 ### Rentals by date via Query
-<DataTable queryID='rentals_by_day' />
-### Rentals by date via date
+<DataTable queryID='rentals_by_day' /> <!-- maybe abandon --> 
+
+### Rentals by date via Data
 <DataTable data={data.rentals_by_day} />
 
 Meta Data

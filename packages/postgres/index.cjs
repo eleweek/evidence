@@ -58,14 +58,19 @@ const nativeTypeToEvidenceType = function (dataTypeId, defaultType = undefined) 
 };
 
 const mapResultsToEvidenceColumnTypes = function (results) {
-    return results.fields.map(field => {
-        let evidenceType = nativeTypeToEvidenceType(field.dataTypeID, EvidenceType.STRING);
-        console.log(`${field.name} mapped to ${evidenceType}`);
-        return ({
-            'name': field.name, 
-            'evidenceType':  evidenceType, 
-            'typeFidelity' : 'precise' 
-        });
+    return results?.fields?.map(field => {
+        let typeFidelity = 'precise';
+        let evidenceType = nativeTypeToEvidenceType(field.dataTypeID);
+        if (!evidenceType) {
+            typeFidelity = 'inferred';
+            evidenceType = EvidenceType.STRING;
+        }
+        return (
+          {
+            'name': field.name,
+            'evidenceType': evidenceType,
+            'typeFidelity': typeFidelity,
+          });
     });
 };
 

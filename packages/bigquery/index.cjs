@@ -112,15 +112,20 @@ const nativeTypeToEvidenceType = function (nativeFieldType, defaultType = undefi
 };
 
 const mapResultsToEvidenceColumnTypes = function (results) {
-    let result = results?.schema?.fields?.map(field => {
+    return results?.schema?.fields?.map(field => {
+        let typeFidelity = 'precise';
+        let evidenceType = nativeTypeToEvidenceType(field.type);
+        if (!evidenceType) {
+            typeFidelity = 'inferred';
+            evidenceType = EvidenceType.STRING;
+        }
         return (
           {
             'name': field.name,
-            'evidenceType': nativeTypeToEvidenceType(field.type, EvidenceType.STRING),
-            'typeFidelity': 'precise' //TODO use enum
+            'evidenceType': evidenceType,
+            'typeFidelity': typeFidelity,
           });
-      });
-    return result;
+    });
 };
 
 
