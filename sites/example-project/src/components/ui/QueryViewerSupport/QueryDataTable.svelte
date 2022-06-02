@@ -10,7 +10,6 @@
     if (queryID && queryID !== 'untitled') {
         data = getContext('pageQueryResults').getData(queryID);
         if (data) {
-          //updated solution TODO get this from helper.  TODO it seems to be a problem that we have to index this.  Probably something wrong about setting it into a single item array.
           let columnTypes =  data[0]['_evidenceColumnTypes'];
           
           if (columnTypes) {
