@@ -92,8 +92,6 @@ const createDefaultProps = function(filename, componentDevelopmentMode, fileQuer
                         }
                         evidenceTypedData.push(nextItem);
                     }
-                    console.log('queryName=' + JSON.stringify(evidenceTypedData, null, 2));
-
                     return evidenceTypedData;
                 },
                 getColumnTypes: (queryName) => {
@@ -105,8 +103,6 @@ const createDefaultProps = function(filename, componentDevelopmentMode, fileQuer
             });
 
             ${queryDeclarations}
-
-            console.log('data=' + JSON.stringify(data, null, 2));
 
             import QueryViewer from '@evidence-dev/components/ui/QueryViewer.svelte';
             ${defaultProps}

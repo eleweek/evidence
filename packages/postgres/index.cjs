@@ -121,7 +121,6 @@ const runQuery = async (queryString, database) => {
 
         var pool = new Pool(credentials);
         var result = await pool.query(queryString)
-        console.log(`Query fields ${JSON.stringify(result.fields)}`);
 
         const standardizedRows = await standardizeResult(result.rows);
 
