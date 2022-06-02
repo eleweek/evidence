@@ -38,7 +38,7 @@ const createModuleContext = function(filename){
     return moduleContext
 } 
 
-const createDefaultProps = function(filename, componentDevelopmentMode){
+const createDefaultProps = function(filename, componentDevelopmentMode, queryIds){
     let componentSource = componentDevelopmentMode ? '$lib' : '@evidence-dev/components'
     let routeHash = getRouteHash(filename)
     let defaultProps = `
@@ -65,7 +65,9 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
         let routeHash = '${routeHash}'
         `
   
-    if(hasQueries(filename)){ //getQueriesById(filename) => ['query1', 'query2']
+    if(hasQueries(filename)){
+        let queryDeclarations = queryIds?.map(id => `let ${id} = getContext('pageQueryResults').getData('${id}');`).join('\n') ||'';
+
         defaultProps = `
             export let data;
             pageHasQueries.update(value => value = true);
@@ -74,7 +76,8 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
                 getData: (queryName) => {
                     let originalData = data[queryName];
                     let evidenceTypedData = [];
-                    let columnTypes = data.evidencemeta?.queries?.filter(query => query.id === queryName)?.map(record => record.columnTypes);
+
+                    let columnTypes = data.evidencemeta?.queries?.find(query => query.id === queryName)?.columnTypes;
 
                     for (var i = 0; i < originalData.length; i++) {
                         let nextItem = originalData[i];
@@ -89,7 +92,6 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
                         evidenceTypedData.push(nextItem);
                     }
                     console.log('queryName=' + JSON.stringify(evidenceTypedData, null, 2));
-                    console.log('firstRowEvidenceMetadata=' + JSON.stringify(evidenceTypedData[0]['_evidenceColumnTypes']), null, 2);
 
                     return evidenceTypedData;
                 },
@@ -102,7 +104,7 @@ const createDefaultProps = function(filename, componentDevelopmentMode){
             });
 
             //TODO inject queries using extracted query objects.
-            let rentals_by_customer = getContext('pageQueryResults').getData('rentals_by_customer');
+            ${queryDeclarations}
 
             console.log('data=' + JSON.stringify(data, null, 2));
 
@@ -141,7 +143,7 @@ const updateExtractedQueriesDir = function(content, filename){
         queries.push(
             {id, compiledQueryString, inputQueryString, compiled}
         )
-    })
+    });
 
     // Handle query chaining:
     let maxIterations = 100
@@ -179,21 +181,21 @@ const updateExtractedQueriesDir = function(content, filename){
 
     if (queries.length === 0) {
         removeSync(queryDir)
-        return
+        return [];
     }
     let queryHash = md5(JSON.stringify(queries))
     if (fs.existsSync(`${queryDir}/${queryHash}.json`)){
-        return
+        return queryIds;
     }
     if (queries.length > 0) {
         if(!fs.existsSync(queryDir)){
             fs.mkdirSync(queryDir)
-            writeJSONSync(`${queryDir}/${queryHash}.json`, queries)
         }else{
             emptyDirSync(queryDir)
-            writeJSONSync(`${queryDir}/${queryHash}.json`, queries)
         }
+        writeJSONSync(`${queryDir}/${queryHash}.json`, queries);
     }
+    return queryIds;
 }
 
 function highlighter(code, lang) {
@@ -208,11 +210,13 @@ function highlighter(code, lang) {
 }
 
 module.exports = function evidencePreprocess(componentDevelopmentMode = false){
+    let queryIdCache = [];
     return [
         {
             markup({content, filename}){
                 if(filename.endsWith(".md")){
-                    updateExtractedQueriesDir(content, filename)
+                    let queryIds = updateExtractedQueriesDir(content, filename);
+                    queryIdCache.push({'filename': filename, 'queryIds': queryIds});
                 }
             }
         },
@@ -257,7 +261,8 @@ module.exports = function evidencePreprocess(componentDevelopmentMode = false){
             script({content, filename, attributes}) {
                 if(filename.endsWith(".md")){
                     if(attributes.context != "module") {
-                        return {code: createDefaultProps(filename, componentDevelopmentMode) + content }
+                        let fileQueryIds = queryIdCache.find(item => filename === item.filename)?.queryIds;
+                        return {code: createDefaultProps(filename, componentDevelopmentMode, fileQueryIds) + content }
                     }	
                 }
             }

@@ -16,13 +16,22 @@ order by 1 desc
 ### Summary
 The most recent day of data was logged on <Value data={data.rentals_by_day} fmt=date/> and the number of rentals was <Value data={data.rentals_by_day} column="total_rentals"/>.
 
-### Daily Chart
+### Daily Chart (using data object)
 
 <LineChart 
     data={data.rentals_by_day} 
     x=day 
     y=total_rentals
 />
+
+### Daily Chart (using rentals_by_day) object
+
+<LineChart 
+    data={rentals_by_day} 
+    x=day 
+    y=total_rentals
+/>
+
 
 ## Rentals by customer
 
@@ -36,8 +45,6 @@ order by 3 desc
 limit 10;
 ```
 ## Top 10 Customers
-
-
 <DataTable data={[{col1:'A', col2: 100 }, {col1: 'B', col2: 200}]} />
 
 ### Rentals by customer via Query
@@ -56,8 +63,16 @@ limit 10;
 ### Rentals by date via Data
 <DataTable data={data.rentals_by_day} />
 
+## Iterating over each item
+{#each rentals_by_day as dailyRental}
+    On date <Value value= {dailyRental.day}/>, the total rentals = <Value value= {dailyRental.total_rentals}/>
+    <DataTable data={dailyRental._evidenceColumnTypes} />
+{/each}
+
 Meta Data
 <Value value={JSON.stringify(data.evidencemeta, 2, null)} />
+
+
 
 
 <br/>

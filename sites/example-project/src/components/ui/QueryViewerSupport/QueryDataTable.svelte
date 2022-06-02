@@ -14,7 +14,7 @@
           // original solution: only works if the component receives queryId info => let columnTypes =  getContext('pageQueryResults').getColumnTypes(queryID);
 
           //updated solution TODO get this from helper.  TODO it seems to be a problem that we have to index this.  Probably something wrong about setting it into a single item array.
-          let columnTypes =  data[0]['_evidenceColumnTypes'][0];
+          let columnTypes =  data[0]['_evidenceColumnTypes'];
           
           // TODO debugging remove this after console.log(`Col Types ${JSON.stringify(columnTypes, null, 2)} ${data[0].hasOwnProperty('_evidenceColumnTypes')}`);
           if (columnTypes) {
