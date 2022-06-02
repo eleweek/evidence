@@ -19,13 +19,16 @@
                 if (column.typeFidelity === 'precise') {
                   switch (column.evidenceType) {
                     case 'date':
-                      columnDisplayName = column.name + ' (' + '\u23F3' + ')';
+                      columnDisplayName = `${column.name} 📅`;
                       break;
                     case 'number':
-                      columnDisplayName = `${column.name} (#)`;
+                      columnDisplayName = `${column.name} 🔢`;
+                      break;
+                    case 'boolean':
+                      columnDisplayName = `${column.name} ☑️`;
                       break;
                     case 'string':
-                      columnDisplayName = `${column.name} (A)`
+                      columnDisplayName = `${column.name} 🔤`
                       break;
                     default:
                       break;

@@ -136,7 +136,6 @@ const processQueryResults = function (queryResults) {
 
     if (queryResults.columnTypes) {
         columnTypes = queryResults.columnTypes;
-        //TODO standardize data standardizeRowData(rows, queryResults.columnTypes);
     } else {
         columnTypes = inferColumnTypes(rows);
     }
@@ -146,8 +145,8 @@ const processQueryResults = function (queryResults) {
 
 /** adds columnTypes to metadata in the page `data` object */
 const populateColumnTypeMetadata = (data, queryIndex, columnTypes) => {
-    let queryMetaData = data.evidencemeta?.queries[queryIndex];
-    if (columnTypes) {
+    let queryMetaData = data.evidencemeta?.queries?.[queryIndex];
+    if (queryMetaData && columnTypes) {
         queryMetaData.columnTypes = columnTypes;
     }
 } 

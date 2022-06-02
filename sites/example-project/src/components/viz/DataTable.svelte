@@ -88,7 +88,9 @@
               <th class="index" style="width:2%"></th>
           {/if}
           {#each columnSummary as column}
-              <th class="{column.type}" style="width:{columnWidths}%" evidenceType="{column.evidenceColumnType?.evidenceType || 'unavailable'}"> {column.title} </th>
+              <th class="{column.type}" style="width:{columnWidths}%" 
+                  evidenceType="{column.evidenceColumnType?.evidenceType || 'unavailable'}"
+                  evidenceTypeFidelity="{column.evidenceColumnType?.typeFidelity || 'unavailable'}"> {column.title} </th>
           {/each}
         <tr/>
       </thead>

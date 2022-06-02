@@ -63,7 +63,7 @@ const runQuery = async (queryString, database) => {
         const [rows] = await job.getQueryResults();
         const [, , response] = await job.getQueryResults({
             autoPaginate: false,
-        }); //TODO figure out API results
+        });
         const standardizedRows = await standardizeResult(rows);
         return { rows: standardizedRows, columnTypes : mapResultsToEvidenceColumnTypes(response) };
     } catch (err) {
