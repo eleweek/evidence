@@ -7,7 +7,7 @@ var EvidenceType;
     EvidenceType["NUMBER"] = "number";
     EvidenceType["STRING"] = "string";
     EvidenceType["DATE"] = "date";
-})(EvidenceType || (EvidenceType = {}));
+})(EvidenceType || (EvidenceType = {})); //TODO extract copied enum to common source
 /**
  * Some types that are not defined in the PG library
  */

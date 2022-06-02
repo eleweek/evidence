@@ -6,7 +6,7 @@ var EvidenceType;
     EvidenceType["NUMBER"] = "number";
     EvidenceType["STRING"] = "string";
     EvidenceType["DATE"] = "date";
-})(EvidenceType || (EvidenceType = {})); //TODO avoid duplication
+})(EvidenceType || (EvidenceType = {})); //TODO extract copied enum to common source
 
 const standardizeResult = async(result) => {
     var output = [];

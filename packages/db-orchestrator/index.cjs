@@ -13,7 +13,7 @@ var EvidenceType;
     EvidenceType["NUMBER"] = "number";
     EvidenceType["STRING"] = "string";
     EvidenceType["DATE"] = "date";
-})(EvidenceType || (EvidenceType = {})); //TODO avoid duplication
+})(EvidenceType || (EvidenceType = {}));
 
 var TypeFidelity;
 (function (TypeFidelity) {
