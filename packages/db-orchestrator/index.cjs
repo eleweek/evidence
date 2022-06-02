@@ -76,11 +76,11 @@ const importDBAdapter = async function(settings) {
 }
 
 const inferValueType = function (columnValue) {
-    if (typeof columnValue == 'number') {
+    if (typeof columnValue === 'number') {
         return EvidenceType.NUMBER;
-    } else if (typeof columnValue == 'boolean') {
+    } else if (typeof columnValue === 'boolean') {
         return EvidenceType.BOOLEAN;
-    } else if (typeof columnValue == 'string') {
+    } else if (typeof columnValue === 'string') {
         let result = EvidenceType.STRING;
         if(columnValue && columnValue.includes("-")){
             let testDateStr = columnValue;

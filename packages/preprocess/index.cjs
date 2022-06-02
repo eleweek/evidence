@@ -38,7 +38,7 @@ const createModuleContext = function(filename){
     return moduleContext
 } 
 
-const createDefaultProps = function(filename, componentDevelopmentMode, queryIds){
+const createDefaultProps = function(filename, componentDevelopmentMode, fileQueryIds){
     let componentSource = componentDevelopmentMode ? '$lib' : '@evidence-dev/components'
     let routeHash = getRouteHash(filename)
     let defaultProps = `
@@ -66,8 +66,9 @@ const createDefaultProps = function(filename, componentDevelopmentMode, queryIds
         `
   
     if(hasQueries(filename)){
-        let queryDeclarations = queryIds?.map(id => `let ${id} = getContext('pageQueryResults').getData('${id}');`).join('\n') ||'';
-
+        let queryDeclarations = fileQueryIds?.filter(queryId => queryId.match('^([a-zA-Z_$][a-zA-Z\d_$]*)$'))
+                                         .map(id => `let ${id} = getContext('pageQueryResults').getData('${id}');`)
+                                         .join('\n') || '';
         defaultProps = `
             export let data;
             pageHasQueries.update(value => value = true);
@@ -103,7 +104,6 @@ const createDefaultProps = function(filename, componentDevelopmentMode, queryIds
                 }
             });
 
-            //TODO inject queries using extracted query objects.
             ${queryDeclarations}
 
             console.log('data=' + JSON.stringify(data, null, 2));
@@ -210,13 +210,13 @@ function highlighter(code, lang) {
 }
 
 module.exports = function evidencePreprocess(componentDevelopmentMode = false){
-    let queryIdCache = [];
+    let queryIdsByFile = [];
     return [
         {
             markup({content, filename}){
                 if(filename.endsWith(".md")){
-                    let queryIds = updateExtractedQueriesDir(content, filename);
-                    queryIdCache.push({'filename': filename, 'queryIds': queryIds});
+                    let fileQueryIds = updateExtractedQueriesDir(content, filename);
+                    queryIdsByFile.push({'filename': filename, 'queryIds': fileQueryIds});
                 }
             }
         },
@@ -261,8 +261,8 @@ module.exports = function evidencePreprocess(componentDevelopmentMode = false){
             script({content, filename, attributes}) {
                 if(filename.endsWith(".md")){
                     if(attributes.context != "module") {
-                        let fileQueryIds = queryIdCache.find(item => filename === item.filename)?.queryIds;
-                        return {code: createDefaultProps(filename, componentDevelopmentMode, fileQueryIds) + content }
+                        let queryIds = queryIdsByFile.find(nextQueryId => filename === nextQueryId.filename)?.queryIds;
+                        return {code: createDefaultProps(filename, componentDevelopmentMode, queryIds) + content }
                     }	
                 }
             }
