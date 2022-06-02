@@ -45,7 +45,9 @@ order by 3 desc
 limit 10;
 ```
 ## Top 10 Customers
-<DataTable data={[{col1:'A', col2: 100 }, {col1: 'B', col2: 200}]} />
+{#each rentals_by_customer as topCustomer}
+    <DataTable data={[topCustomer]}/>
+{/each}
 
 ### Rentals by customer via Query
 <DataTable queryID=rentals_by_customer />
@@ -54,11 +56,14 @@ limit 10;
 <DataTable data={rentals_by_customer} />
 
 ### Rentals by customer via Data
-<DataTable data={data.rentals_by_customer} /> <!-- this has to continue to work thing -->
+<DataTable data={data.rentals_by_customer} />
 
 
 ### Rentals by date via Query
-<DataTable queryID='rentals_by_day' /> <!-- maybe abandon --> 
+<DataTable queryID='rentals_by_day' />
+
+### Rentals by date via Context Data
+<DataTable data={rentals_by_day} />
 
 ### Rentals by date via Data
 <DataTable data={data.rentals_by_day} />
@@ -71,9 +76,6 @@ limit 10;
 
 Meta Data
 <Value value={JSON.stringify(data.evidencemeta, 2, null)} />
-
-
-
 
 <br/>
 
