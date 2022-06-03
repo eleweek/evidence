@@ -1,5 +1,11 @@
 # @evidence-dev/preprocess
 
+## 1.0.1
+
+### Patch Changes
+
+- a728873: Ignore indented code blocks when extracting SQL queries.
+
 ## 1.0.0
 
 ### Major Changes
