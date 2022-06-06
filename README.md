@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**<h2>Business Intelligence for Modern Data Teams</h2>**
+**<h1>Business Intelligence for Modern Data Teams</h1>**
 
 **[Evidence](https://evidence.dev)** enables analysts to deliver a polished business intelligence system using SQL and markdown. 
 
